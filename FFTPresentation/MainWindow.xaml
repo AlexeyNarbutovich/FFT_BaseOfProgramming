@@ -36,9 +36,9 @@
 			<ColumnDefinition></ColumnDefinition>
 			<ColumnDefinition Width="450"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
-		<oxy:PlotView Model="{Binding MyModel}" Grid.Row="0" Grid.RowSpan="4" Grid.Column="0" />
-		<oxy:PlotView Model="{Binding ColumnResultModel}" Grid.Row="4" Grid.RowSpan="4" Grid.Column="0" />
-		<oxy:PlotView Model="{Binding ResultModel}" Grid.Row="8" Grid.RowSpan="4" Grid.Column="0" />
+		<oxy:PlotView Name = "sourcePlot" Model = "{Binding SourcePlotModel}" Grid.Row="0" Grid.RowSpan="4" Grid.Column="0" />
+		<oxy:PlotView Name = "phasePlot" Model = "{Binding PhasePlotModel}" Grid.Row="4" Grid.RowSpan="4" Grid.Column="0" />
+		<oxy:PlotView Name = "attPlot" Model = "{Binding MagnitudePlotModel}" Grid.Row="8" Grid.RowSpan="4" Grid.Column="0" />
 		<GroupBox Header="Help data" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
 			<Label>
 				<TextBlock TextWrapping="WrapWithOverflow" Margin="5">
@@ -74,7 +74,7 @@
 					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
 				<Label HorizontalAlignment="Left">Enter your function into the field below...</Label>
-				<TextBox Text="Cos(2 * PI) * x" Margin="5" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" Name="tbFunction" >
+				<TextBox Text="sum(i,1,6, i * cos(i * 10 * 2 * pi * x))" Margin="5" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" Name="tbFunction" >
 					<TextBox.ToolTip>
 						Enter left part of your function x(t). Like Cos(2*PI)*t.
 					</TextBox.ToolTip>

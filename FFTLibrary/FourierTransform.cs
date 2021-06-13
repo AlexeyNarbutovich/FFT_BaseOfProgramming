@@ -21,20 +21,20 @@ namespace FourierTransform
 		/// <summary>
 		/// Perform Fourier Transformation
 		/// </summary>
-		/// <param name="x">Array of <see cref="Complex"/> numbers</param>
+		/// <param name="sourceData">Array of <see cref="Complex"/> numbers</param>
 		/// <returns>Resulted array of <see cref="Complex"/> numbers</returns>
-		public static Complex[] FastFourierTransform(Complex[] x)
+		public static Complex[] FastFourierTransform(Complex[] sourceData)
 		{
 			Complex[] X;
-			var N = x.Length;
+			var N = sourceData.Length;
 			if (N == 2)
 			{
 				/*X = new Complex[1];
-				X[0] = x[0];*/
+				X[0] = sourceData[0];*/
 				
 				X = new Complex[2];
-				X[0] = x[0] + x[1];
-				X[1] = x[0] - x[1];
+				X[0] = sourceData[0] + sourceData[1];
+				X[1] = sourceData[0] - sourceData[1];
 			}
 			else
 			{
@@ -42,8 +42,8 @@ namespace FourierTransform
 				Complex[] x_odd = new Complex[N / 2];
 				for (int i = 0; i < N / 2; i++)
 				{
-					x_even[i] = x[2 * i];
-					x_odd[i] = x[2 * i + 1];
+					x_even[i] = sourceData[2 * i];
+					x_odd[i] = sourceData[2 * i + 1];
 				}
 
 				Complex[] X_even = FastFourierTransform(x_even);

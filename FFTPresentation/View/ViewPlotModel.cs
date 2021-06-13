@@ -1,79 +1,104 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using org.mariuszgromada.math.mxparser;
 using OxyPlot;
 using OxyPlot.Series;
+using System;
+using System.Numerics;
 
 namespace FFTPresentation.View
 {
 	public class ViewPlotModel
 	{
-		public PlotModel MyModel { get; set; }
-		public PlotModel ResultModel { get; set; }
-		public PlotModel ColumnResultModel { get; set; }
-		public Complex[] result { get; set; }
-
+		public PlotModel SourcePlotModel { get; set; }
+		public PlotModel MagnitudePlotModel { get; set; }
+		public PlotModel PhasePlotModel { get; set; }
+		public Complex[] ResultData { get; set; }
+		public Complex[] SourceData { get; set; }
+		public string FunctionName { get; set; }
 		public int N { get; set; }
+		public string Expression { get; set; }
 
-		//private int N => (int)Math.Pow(2, 11);
-		private double Arrange => 0.1;
-		private double Step = 0.0001;// => Arrange / N;
+		private double Arrange => 1;
+		private double Step => Arrange / N;
+		private int currentStep = 0;
+
 
 		public ViewPlotModel()
 		{
-			MyModel = new PlotModel { Title = "x(t)" };
-			//MyModel.Series.Add(new FunctionSeries(sourceFunction, 0, 0.5, 0.001, "sin(2pi*x)"));
+			GetInitResult();
+			SourcePlotModel = new PlotModel { Title = "x(t)" };
+			SourcePlotModel.Series.Add(new FunctionSeries(SourceFunction, 0, 0.5, 0.001, FunctionName));
 
-			ResultModel = new PlotModel {Title = "A(t)"};
-			//ResultModel.Series.Add(new FunctionSeries( Magnitude, 0, Arrange - Step, Step));
+			MagnitudePlotModel = new PlotModel {Title = "A(t)"};
+			MagnitudePlotModel.Series.Add(new FunctionSeries(Magnitude, 0, Arrange - Step, Step));
+			
+			PhasePlotModel = new PlotModel { Title = "Phase(t)" };
+			PhasePlotModel.Series.Add(new FunctionSeries(Phase, 0, Arrange - Step, Step));
+		}
 
-			ColumnResultModel = new PlotModel { Title = "Phase(t)" };
+		public void UpdateSourcePlotModel()
+		{
+			for (int i = 0; i < N; i++)
+			{
+				SourceData[i] = new Complex(SourceFunction(i / 100.0), 0.0);
+			}
+			
+			SourcePlotModel.InvalidatePlot(true);
+		}
 
-			//ColumnResultModel.Series.Add(new FunctionSeries(Phase, 0, Arrange - Step, Step));
+		public void UpdateResultedMode()
+		{
+			MagnitudePlotModel.InvalidatePlot(true);
+			PhasePlotModel.InvalidatePlot(true);
 		}
 
 		private double Phase(double index)
 		{
 			int i = (int)(index / (Arrange / N));
-			return result[i].Imaginary;
+			return ResultData[i].Imaginary;
 		}
 
 		private double Magnitude(double index)
 		{
 			int i = (int)(index / (Arrange / N));
-			return result[i].Magnitude;
+			return ResultData[i].Magnitude;
 		}
 
-		private Complex[] GetResult()
+		private double Source(double index)
 		{
-			
-			var X = new Complex[N];
+			if (currentStep < SourceData.Length)
+			{
+				currentStep++;
+				return SourceData[currentStep-1].Real;
+
+			}
+
+			currentStep = 0;
+			return 0;
+		}
+
+		private void GetInitResult()
+		{
+			N = (int)Math.Pow(2, 11);
+			Expression = "sum(i,1,6, i * cos(i * 10 * 2 * pi * x))";
+			SourceData = new Complex[N];
 			for (int i = 0; i < N; i++)
 			{
-				X[i] = new Complex(sourceFunction(i/100.0), 0.0); 
+				SourceData[i] = new Complex(SourceFunction(i/100.0), 0.0);
 			}
 
-			return FourierTransform.FFT.FastFourierTransform(X);
+			ResultData = FourierTransform.FFT.FastFourierTransform(SourceData);
 		}
 
-		private double sourceFunction(double x)
+		private double SourceFunction(double x)
 		{
-			double result = 0.0;
-			for (int i = 1; i < 6; i++)
-
-			{
-				result = result + i * Math.Cos(i * 10 * 2 * Math.PI * x);
-			}
-
-			return result;
+			Function Ft = new Function($"Ft(x) = {Expression}");
+			Argument xArgument = new Argument($"x = {x}");
+			Expression ex = new Expression("Ft(x)", Ft, xArgument);
+			return ex.calculate();
+			//return result;
 			//return Math.Sin(10 * 2 * Math.PI * x) + 0.5 * Math.Sin(5 * 2 * Math.PI*x);
 			//return Math.Sin(2 * Math.PI * x);
-		}
-
-		private IEnumerable<ColumnItem> CountList()
-		{
-			return result.Select(i => new ColumnItem(i.Magnitude));
+			//result = result + i * Math.Cos(i * 10 * 2 * Math.PI * x);
 		}
 	}
-}
+ }
